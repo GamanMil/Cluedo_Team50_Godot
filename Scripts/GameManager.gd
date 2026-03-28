@@ -64,7 +64,6 @@ func setup_game(player_count: int, ai_count: int = 0) -> void:
 	_deal_cards(playing_deck)
 
 	emit_signal("game_setup_complete")
-	_debug_print_setup()
 
 #helpers
 func _pick_solution(suspects: Array[ClueCard], weapons: Array[ClueCard], rooms: Array[ClueCard]) -> void:
@@ -166,22 +165,3 @@ func run_disprove_loop(suggesting_player: Player, suspect: ClueCard, weapon: Clu
 			return
 
 	print("Nobody could disprove the suggestion.")
-
-func _debug_print_setup() -> void:
-	print("=== GAME SETUP ===")
-	print("Solution: %s | %s | %s" % [
-		solution["suspect"].card_name,
-		solution["weapon"].card_name,
-		solution["room"].card_name
-	])
-	print("Weapon locations:")
-	for weapon_name in weapon_locations:
-		print("  %s → %s" % [weapon_name, weapon_locations[weapon_name]])
-	for player in players:
-		if player.is_spare:
-			print("%s (spare piece, no hand)" % player.suspect_name)
-		else:
-			var hand_names = player.hand.map(func(c): return c.card_name)
-			var type_label = "AI" if not player.is_human else "Human"
-			print("%s [%s] (%d cards): %s" % [player.player_name, type_label, player.hand.size(), ", ".join(hand_names)])
-	print("==================")
