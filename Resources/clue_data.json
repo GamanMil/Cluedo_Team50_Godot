@@ -1,0 +1,35 @@
+{
+  "suspects": [
+	"Miss Scarlett",
+	"Col Mustard",
+	"Prof Plum",
+	"Rev Green",
+	"Mrs Peacock",
+    "Mrs White"
+  ],
+  "weapons": [
+	"Dagger",
+	"Candlestick",
+	"Revolver",
+	"Rope",
+	"Lead Piping",
+    "Spanner"
+  ],
+  "rooms": [
+	"Kitchen",
+	"Ballroom",
+	"Conservatory",
+	"Dining Room",
+	"Billiard Room",
+	"Library",
+	"Lounge",
+	"Hall",
+    "Study"
+  ],
+  "secret_passages": {
+	"Study":        "Kitchen",
+	"Kitchen":      "Study",
+	"Conservatory": "Lounge",
+	"Lounge":       "Conservatory"
+  }
+}
