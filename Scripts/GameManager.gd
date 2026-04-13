@@ -20,7 +20,6 @@ var weapon_locations: Dictionary = {}
 func _ready() -> void:
 	var data = _load_data("res://clue_data.json")
 	_generate_all_cards(data)
-	setup_game(3, 0)
 
 #data loading
 func _load_data(path: String) -> Dictionary:
