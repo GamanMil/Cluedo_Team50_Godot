@@ -18,7 +18,7 @@ var players:          Array[Player] = []
 var weapon_locations: Dictionary = {} 
 
 func _ready() -> void:
-	var data = _load_data("res://clue_data.json")
+	var data = _load_data("res://Resources/clue_data.json")
 	_generate_all_cards(data)
 
 #data loading

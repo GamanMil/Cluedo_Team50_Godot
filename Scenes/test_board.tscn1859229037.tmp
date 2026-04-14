@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://cf7hyoxdf7x1"]
+
+[ext_resource type="Script" uid="uid://wa25nkvrp5ts" path="res://Scripts/Main.gd" id="1_4yq3r"]
+[ext_resource type="Script" uid="uid://r2x1faywsx8c" path="res://Scripts/Board.gd" id="1_dct37"]
+[ext_resource type="Script" uid="uid://g4xvf33pcbjo" path="res://Scripts/GameManager.gd" id="3_a83bs"]
+[ext_resource type="Script" uid="uid://drcddidua12iu" path="res://Scripts/TurnManager.gd" id="4_nafu8"]
+
+[node name="Main" type="Node2D" unique_id=1362361515]
+script = ExtResource("1_4yq3r")
+
+[node name="test_board" type="Node2D" parent="." unique_id=887743397]
+script = ExtResource("1_dct37")
+
+[node name="GameManager" type="Node" parent="." unique_id=1970479132]
+script = ExtResource("3_a83bs")
+
+[node name="TurnManager" type="Node" parent="." unique_id=1424361785]
+script = ExtResource("4_nafu8")

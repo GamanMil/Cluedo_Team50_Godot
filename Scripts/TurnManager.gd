@@ -11,23 +11,26 @@ signal game_over(winner: Player, was_correct: bool)
 
 enum Phase { ROLL, MOVE, SUGGEST, ACCUSE, END_TURN }
 
-var current_phase: Phase       = Phase.ROLL
-var current_player_index: int  = 0
-var steps_remaining: int       = 0
-var current_room: String       = ""  
-var game_manager: Node = null
+var current_phase: Phase      = Phase.ROLL
+var current_player_index: int = 0
+var steps_remaining: int      = 0
+var current_room: String      = ""
+var game_manager: Node        = null
+var board: Node               = null
 
-func start_game(gm: Node) -> void:
+func start_game(gm: Node, b: Node) -> void:
 	game_manager = gm
+	board        = b
+	board.player_entered_room.connect(action_player_moved)
+	board.player_entered_corridor.connect(_on_player_entered_corridor)
 	current_player_index = _find_active_player_by_suspect("Miss Scarlett")
 	_begin_turn()
-	
+
 func _begin_turn() -> void:
 	var player = _current_player()
 	if player.is_spare or player.is_eliminated:
 		_advance_to_next_player()
 		return
-
 	_set_phase(Phase.ROLL)
 	emit_signal("turn_started", player)
 
@@ -35,44 +38,60 @@ func action_roll_dice() -> void:
 	if current_phase != Phase.ROLL:
 		push_warning("TurnManager: action_roll_dice called outside ROLL phase")
 		return
-
-	var die1 = randi_range(1, 6)
-	var die2 = randi_range(1, 6)
-	var total = die1 + die2
+	var die1        = randi_range(1, 6)
+	var die2        = randi_range(1, 6)
+	var total       = die1 + die2
 	steps_remaining = total
-
 	emit_signal("dice_rolled", total, die1, die2)
 	_set_phase(Phase.MOVE)
 	emit_signal("move_required", steps_remaining)
+	if board != null:
+		board.highlight_reachable_cells(_current_player().suspect_name, steps_remaining)
 
 func action_player_moved(room_name: String) -> void:
 	if current_phase != Phase.MOVE:
 		push_warning("TurnManager: action_player_moved called outside MOVE phase")
 		return
-
 	current_room = room_name
-
 	if current_room != "":
 		_set_phase(Phase.SUGGEST)
 		emit_signal("suggestion_phase_started", current_room)
 	else:
 		_end_turn()
-		
+
+func _on_player_entered_corridor() -> void:
+	if current_phase != Phase.MOVE:
+		return
+	current_room = ""
+	_end_turn()
+
+func action_use_secret_passage() -> void:
+	if current_phase != Phase.ROLL:
+		push_warning("TurnManager: secret passage can only be used at the start of a turn")
+		return
+	if board == null:
+		return
+	var dest = board.get_secret_passage_destination(_current_player().suspect_name)
+	if dest == "":
+		push_warning("TurnManager: no secret passage available for %s" % _current_player().suspect_name)
+		return
+	board.use_secret_passage(_current_player().suspect_name)
+	current_room = dest
+	_set_phase(Phase.SUGGEST)
+	emit_signal("suggestion_phase_started", current_room)
+
 func action_make_suggestion(suspect: ClueCard, weapon: ClueCard) -> void:
 	if current_phase != Phase.SUGGEST:
 		push_warning("TurnManager: action_make_suggestion called outside SUGGEST phase")
 		return
-
 	if suspect == null or weapon == null:
 		_end_turn()
 		return
-		
 	var room_card = game_manager.get_room_card_by_name(current_room)
 	if room_card == null:
 		push_error("TurnManager: Could not find room card for '%s'" % current_room)
 		_end_turn()
 		return
-
 	game_manager.run_disprove_loop(_current_player(), suspect, weapon, room_card)
 
 func finish_suggestion() -> void:
