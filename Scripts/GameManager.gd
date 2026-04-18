@@ -21,7 +21,6 @@ func _ready() -> void:
 	var data = _load_data("res://Resources/clue_data.json")
 	_generate_all_cards(data)
 
-#data loading
 func _load_data(path: String) -> Dictionary:
 	var file = FileAccess.open(path, FileAccess.READ)
 	var json  = JSON.new()
