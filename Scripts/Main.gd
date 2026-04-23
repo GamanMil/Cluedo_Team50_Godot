@@ -31,6 +31,7 @@ func _on_phase_changed(phase) -> void:
 		TurnManager.Phase.MOVE:
 			roll_button.visible = false
 			hud.text = hud.text + " — click a highlighted cell to move"
+			print("Highlights set: ", board._highlighted_cells.size())
 		TurnManager.Phase.SUGGEST:
 			hud.text = hud.text + " — in " + turn_manager.current_room
 		TurnManager.Phase.END_TURN:
@@ -38,3 +39,5 @@ func _on_phase_changed(phase) -> void:
 
 func _on_dice_rolled(total, die1, die2) -> void:
 	hud.text = hud.text + " — rolled %d + %d = %d" % [die1, die2, total]
+	print("Dice rolled, highlighting cells for: ", turn_manager._current_player().suspect_name)
+	print("Highlighted cells: ", board._highlighted_cells.size())

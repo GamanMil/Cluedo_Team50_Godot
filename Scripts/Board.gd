@@ -233,7 +233,7 @@ func map_to_local(cell: Vector2i) -> Vector2:
 	return Vector2(cell) * CELL_SIZE + Vector2(CELL_SIZE * 0.5, CELL_SIZE * 0.5)
 
 func world_to_cell(world_pos: Vector2) -> Vector2i:
-	var local_unscaled := to_local(world_pos) / scale
+	var local_unscaled := to_local(world_pos) 
 	return Vector2i(int(local_unscaled.x / CELL_SIZE), int(local_unscaled.y / CELL_SIZE))
 
 func _room_cell_bounds(room: BoardRoomData) -> Rect2i:
@@ -257,6 +257,7 @@ func _spawn_tokens(players: Array) -> void:
 
 func highlight_reachable_cells(suspect_name: String, steps: int) -> void:
 	_active_token = tokens.get(suspect_name, null)
+	print("Token cell: ", _active_token.current_cell)
 	if _active_token == null:
 		return
 	_highlighted_cells = _get_reachable_cells(_active_token.current_cell, steps)
@@ -272,6 +273,8 @@ func _get_reachable_cells(from: Vector2i, steps: int) -> Array[Vector2i]:
 	var reachable: Array[Vector2i] = []
 	var queue: Array = [[from, steps]]
 	var occupied: Dictionary = _get_occupied_corridor_cells()
+	print("BFS starting from: ", from, " with steps: ", steps)
+	print("Room cells count: ", _room_cells.size())
 
 	while not queue.is_empty():
 		var e = queue.pop_front()
