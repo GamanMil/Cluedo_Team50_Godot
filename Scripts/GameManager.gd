@@ -131,6 +131,18 @@ func check_accusation(suspect: ClueCard, weapon: ClueCard, room: ClueCard) -> bo
 		room.card_name    == solution["room"].card_name
 	)
 
+func get_suspect_card_by_name(suspect_name: String) -> ClueCard:
+	for card in all_suspect_cards:
+		if card.card_name == suspect_name:
+			return card
+	return null
+
+func get_weapon_card_by_name(weapon_name: String) -> ClueCard:
+	for card in all_weapon_cards:
+		if card.card_name == weapon_name:
+			return card
+	return null
+
 func get_matching_cards(player: Player, suspect: ClueCard, weapon: ClueCard, room: ClueCard) -> Array[ClueCard]:
 	var matches: Array[ClueCard] = []
 	for card in player.hand:

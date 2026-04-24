@@ -5,6 +5,7 @@ extends Node2D
 @onready var board        = $test_board
 @onready var roll_button  = $UI/Button
 @onready var hud          = $UI/HUD
+@onready var suggestion_panel = $UI/SuggestionPanel
 
 func _ready() -> void:
 	var data = game_manager._load_data("res://Resources/clue_data.json")
@@ -19,7 +20,23 @@ func _ready() -> void:
 
 	board.setup_board(game_manager.players)
 	turn_manager.start_game(game_manager, board)
+	suggestion_panel.populate(game_manager.all_suspect_cards, game_manager.all_weapon_cards)
+	turn_manager.suggestion_phase_started.connect(_on_suggestion_phase_started)
+	suggestion_panel.suggestion_confirmed.connect(_on_suggestion_confirmed)
+	suggestion_panel.suggestion_skipped.connect(_on_suggestion_skipped)
 
+func _on_suggestion_phase_started(room_name: String) -> void:
+	hud.text = "Make a suggestion — you are in the %s" % room_name
+	suggestion_panel.show_for_room(room_name)
+
+func _on_suggestion_confirmed(suspect_name: String, weapon_name: String) -> void:
+	var suspect = game_manager.get_suspect_card_by_name(suspect_name)
+	var weapon  = game_manager.get_weapon_card_by_name(weapon_name)
+	turn_manager.action_make_suggestion(suspect, weapon)
+
+func _on_suggestion_skipped() -> void:
+	turn_manager.action_make_suggestion(null, null)
+	
 func _on_turn_started(player) -> void:
 	hud.text = "%s's turn" % player.player_name
 	roll_button.visible = true
