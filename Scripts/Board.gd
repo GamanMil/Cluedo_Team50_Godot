@@ -31,12 +31,12 @@ const ROOM_COLORS := {
 }
 
 const STARTING_CELLS := {
-	"Miss Scarlett": Vector2i(7, 24),
-	"Col Mustard": Vector2i(16, 24),
-	"Prof Plum": Vector2i(23, 16),
-	"Rev Green": Vector2i(23, 7),
-	"Mrs Peacock": Vector2i(0, 6),
-	"Mrs White": Vector2i(7, 0),
+	"Miss Scarlett": Vector2i(16, 0),
+	"Col Mustard": Vector2i(23, 7),
+	"Prof Plum": Vector2i(0, 22),
+	"Rev Green": Vector2i(7, 24),
+	"Mrs Peacock": Vector2i(0, 7),
+	"Mrs White": Vector2i(16, 24),
 }
 
 const TOKEN_COLORS := {
