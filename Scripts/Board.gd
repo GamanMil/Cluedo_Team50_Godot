@@ -36,7 +36,7 @@ const STARTING_CELLS := {
 	"Prof Plum": Vector2i(23, 16),
 	"Rev Green": Vector2i(23, 7),
 	"Mrs Peacock": Vector2i(0, 6),
-	"Mrs White": Vector2i(9, 0),
+	"Mrs White": Vector2i(7, 0),
 }
 
 const TOKEN_COLORS := {
@@ -233,8 +233,8 @@ func map_to_local(cell: Vector2i) -> Vector2:
 	return Vector2(cell) * CELL_SIZE + Vector2(CELL_SIZE * 0.5, CELL_SIZE * 0.5)
 
 func world_to_cell(world_pos: Vector2) -> Vector2i:
-	var local_unscaled := to_local(world_pos) 
-	return Vector2i(int(local_unscaled.x / CELL_SIZE), int(local_unscaled.y / CELL_SIZE))
+	var local := to_local(world_pos)
+	return Vector2i(int(local.x / CELL_SIZE), int(local.y / CELL_SIZE))
 
 func _room_cell_bounds(room: BoardRoomData) -> Rect2i:
 	if room.cells.is_empty():
@@ -273,18 +273,19 @@ func _get_reachable_cells(from: Vector2i, steps: int) -> Array[Vector2i]:
 	var reachable: Array[Vector2i] = []
 	var queue: Array = [[from, steps]]
 	var occupied: Dictionary = _get_occupied_corridor_cells()
-	print("BFS starting from: ", from, " with steps: ", steps)
-	print("Room cells count: ", _room_cells.size())
+	var from_room: bool = _room_cells.has(from)
 
 	while not queue.is_empty():
 		var e = queue.pop_front()
 		var cell: Vector2i = e[0]
 		var rem: int = e[1]
 		var in_room: bool = _room_cells.has(cell)
-
+		
 		if in_room and cell != from:
-			reachable.append(cell)
-			continue
+			if _is_door_cell(cell):
+				var room_name = _room_cells[cell]
+				reachable.append(rooms[room_name].centre_cell())
+			continue  
 
 		if rem == 0:
 			if not in_room:
@@ -302,6 +303,12 @@ func _get_reachable_cells(from: Vector2i, steps: int) -> Array[Vector2i]:
 			queue.append([nb, rem - 1])
 
 	return reachable
+
+func _is_door_cell(cell: Vector2i) -> bool:
+	for room in rooms.values():
+		if cell in room.door_cells:
+			return true
+	return false
 
 func _orthogonal_neighbours(cell: Vector2i) -> Array[Vector2i]:
 	return [
@@ -332,21 +339,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if _highlighted_cells.is_empty() or _active_token == null:
 		return
-
-	var clicked: Vector2i = world_to_cell(get_global_mouse_position())
+		
+	var local  := get_local_mouse_position()
+	var clicked := Vector2i(int(local.x / CELL_SIZE), int(local.y / CELL_SIZE))
 	if not clicked in _highlighted_cells:
 		return
-
-	var room: BoardRoomData = _room_for_cell(clicked) as BoardRoomData
-	var room_name: String = ""
-	if room != null:
-		room_name = room.room_name
-
+	var room_name: String = _room_cells.get(clicked, "")
 	_active_token.move_to_cell(clicked, room_name, self)
 	_clear_highlights()
-
+	
 	if room_name != "":
-		emit_signal("player_entered_room", room_name)
+		emit_signal("player_entered_room", room_name)	
 	else:
 		emit_signal("player_entered_corridor")
 
