@@ -4,7 +4,6 @@ class_name BoardToken
 var suspect_name: String   = ""
 var current_cell: Vector2i = Vector2i.ZERO
 var current_room: String   = ""
-
 var _color:  Color  = Color.WHITE
 var _label:  String = ""
 

@@ -2,8 +2,6 @@ extends Node
 
 signal game_setup_complete
 signal cards_dealt
-
-
 const SECRET_PASSAGES: Dictionary = {
 	"Study":        "Kitchen",
 	"Kitchen":      "Study",
@@ -16,6 +14,7 @@ var all_room_cards:    Array[ClueCard] = []
 var solution:         Dictionary = {} 
 var players:          Array[Player] = []
 var weapon_locations: Dictionary = {} 
+var turn_manager_ref: Node = null
 
 func _ready() -> void:
 	var data = _load_data("res://Resources/clue_data.json")
@@ -150,28 +149,17 @@ func get_matching_cards(player: Player, suspect: ClueCard, weapon: ClueCard, roo
 			matches.append(card)
 	return matches
 
+signal disprove_requested(player_name: String, matching_cards: Array)
+
 func run_disprove_loop(suggesting_player: Player, suspect: ClueCard, weapon: ClueCard, room: ClueCard) -> void:
-	print("=== SUGGESTION ===")
-	print("%s suggests: %s | %s | %s" % [
-		suggesting_player.player_name,
-		suspect.card_name,
-		weapon.card_name,
-		room.card_name
-	])
-	
 	var active  = players.filter(func(p): return not p.is_spare)
 	var start   = active.find(suggesting_player)
-	var ordered = []
+
 	for i in range(1, active.size()):
-		ordered.append(active[(start + i) % active.size()])
-
-	for player in ordered:
+		var player = active[(start + i) % active.size()]
 		var matches = get_matching_cards(player, suspect, weapon, room)
-		if matches.size() > 0:
-			print("%s can disprove! (matching cards: %s)" % [
-				player.player_name,
-				", ".join(matches.map(func(c): return c.card_name))
-			])
-			return
+		if matches.size() > 0 or true: 
+			emit_signal("disprove_requested", player.player_name, matches)
+			return 
 
-	print("Nobody could disprove the suggestion.")
+	turn_manager_ref.finish_suggestion()
