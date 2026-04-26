@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://bgts46tdiv6cn" path="res://Scripts/SuggestionPanel.gd" id="5_a83bs"]
 [ext_resource type="Script" uid="uid://q8lr3bkuodv0" path="res://Scripts/Disprovepanel.gd" id="6_nafu8"]
 [ext_resource type="Script" uid="uid://1bid6102py0l" path="res://Scripts/Accusationpanel.gd" id="7_xkklf"]
+[ext_resource type="Script" uid="uid://cro7qm622d5ht" path="res://Scripts/Handpanel.gd" id="8_1ooi1"]
 
 [node name="Main" type="Node2D" unique_id=1362361515]
 script = ExtResource("1_4yq3r")
@@ -153,3 +154,24 @@ offset_right = 8.0
 offset_bottom = 8.0
 text = "Make Accusation
 "
+
+[node name="HandPanel" type="PanelContainer" parent="UI" unique_id=1134470460]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+script = ExtResource("8_1ooi1")
+
+[node name="VBox" type="VBoxContainer" parent="UI/HandPanel" unique_id=1910747925]
+layout_mode = 2
+
+[node name="PlayerLabel" type="Label" parent="UI/HandPanel/VBox" unique_id=1967169306]
+layout_mode = 2
+
+[node name="CardsHBox" type="HBoxContainer" parent="UI/HandPanel/VBox" unique_id=161522672]
+layout_mode = 2

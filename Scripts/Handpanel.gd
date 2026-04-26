@@ -1,0 +1,63 @@
+extends PanelContainer
+
+@onready var player_label = $VBox/PlayerLabel
+@onready var cards_hbox   = $VBox/CardsHBox
+
+func _ready() -> void:
+	hide()
+
+func show_hand(player) -> void:
+	player_label.text = "%s's cards" % player.player_name
+
+	for child in cards_hbox.get_children():
+		child.queue_free()
+
+	for card in player.hand:
+		var label = PanelContainer.new()
+		var vbox  = VBoxContainer.new()
+		var name_label = Label.new()
+		var type_label = Label.new()
+
+		name_label.text = card.card_name
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD
+
+		type_label.text = _type_string(card.type)
+		type_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+		var style = StyleBoxFlat.new()
+		style.bg_color = _card_color(card.type)
+		style.corner_radius_top_left     = 6
+		style.corner_radius_top_right    = 6
+		style.corner_radius_bottom_left  = 6
+		style.corner_radius_bottom_right = 6
+		style.content_margin_left   = 8
+		style.content_margin_right  = 8
+		style.content_margin_top    = 8
+		style.content_margin_bottom = 8
+		label.add_theme_stylebox_override("panel", style)
+		label.custom_minimum_size = Vector2(80, 90)
+
+		vbox.add_child(name_label)
+		vbox.add_child(type_label)
+		label.add_child(vbox)
+		cards_hbox.add_child(label)
+
+	show()
+
+func hide_hand() -> void:
+	hide()
+
+func _type_string(type) -> String:
+	match type:
+		ClueCard.CardType.SUSPECT: return "Suspect"
+		ClueCard.CardType.WEAPON:  return "Weapon"
+		ClueCard.CardType.ROOM:    return "Room"
+	return ""
+
+func _card_color(type) -> Color:
+	match type:
+		ClueCard.CardType.SUSPECT: return Color(0.70, 0.20, 0.20)
+		ClueCard.CardType.WEAPON:  return Color(0.20, 0.40, 0.70)
+		ClueCard.CardType.ROOM:    return Color(0.20, 0.55, 0.25)
+	return Color(0.3, 0.3, 0.3)

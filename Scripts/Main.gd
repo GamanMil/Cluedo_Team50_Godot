@@ -9,6 +9,7 @@ extends Node2D
 @onready var disprove_panel = $UI/DisprovePanel
 @onready var accusation_panel = $UI/AccusationPanel
 @onready var accuse_button    = $UI/AccuseButton
+@onready var hand_panel = $UI/HandPanel
 
 func _ready() -> void:
 	var data = game_manager._load_data("res://Resources/clue_data.json")
@@ -69,6 +70,7 @@ func _on_suggestion_skipped() -> void:
 func _on_turn_started(player) -> void:
 	hud.text = "%s's turn" % player.player_name
 	roll_button.visible = true
+	hand_panel.show_hand(player)
 
 func _on_phase_changed(phase) -> void:
 	match phase:
@@ -81,10 +83,10 @@ func _on_phase_changed(phase) -> void:
 			hud.text = hud.text + " — click a highlighted cell to move"
 		TurnManager.Phase.SUGGEST:
 			accuse_button.visible = true
-			hud.text = hud.text + " — in " + turn_manager.current_room
 		TurnManager.Phase.END_TURN:
 			roll_button.visible   = false
 			accuse_button.visible = false
+			hand_panel.hide_hand() 
 
 func _on_dice_rolled(total, die1, die2) -> void:
 	hud.text = hud.text + " — rolled %d + %d = %d" % [die1, die2, total]

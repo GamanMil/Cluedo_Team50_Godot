@@ -114,7 +114,10 @@ func _deal_cards(deck: Array[ClueCard]) -> void:
 func _deep_copy_cards(source: Array[ClueCard]) -> Array[ClueCard]:
 	var copy: Array[ClueCard] = []
 	for card in source:
-		copy.append(card.duplicate())
+		var c      = ClueCard.new()
+		c.card_name = card.card_name
+		c.type      = card.type      
+		copy.append(c)
 	return copy
 
 func get_room_card_by_name(room_name: String) -> ClueCard:
