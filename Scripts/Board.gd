@@ -14,6 +14,7 @@ const COLOR_CORRIDOR := Color8(238, 208, 76)
 const COLOR_GRID := Color8(206, 174, 62)
 const COLOR_WALL := Color8(52, 34, 28)
 const COLOR_HIGHLIGHT := Color(0.20, 0.95, 0.25, 0.45)
+const COLOR_HIGHLIGHT_BORDER := Color(0.10, 0.70, 0.15, 1.0)
 const COLOR_LABEL := Color(0.96, 0.92, 0.80)
 const COLOR_CENTER_FILL := Color8(198, 176, 135)
 const COLOR_CENTER_BORDER := Color8(120, 90, 56)
@@ -179,15 +180,14 @@ func _draw_room_outlines_and_doors() -> void:
 		var pr := Rect2(
 			Vector2(b.position.x * CELL_SIZE, b.position.y * CELL_SIZE),
 			Vector2(b.size.x * CELL_SIZE, b.size.y * CELL_SIZE)
-		)
-		draw_rect(pr, COLOR_WALL, false, WALL_W)
-
-		for door in room.door_cells:
-			var dr := Rect2(
-				Vector2(door.x * CELL_SIZE + 1, door.y * CELL_SIZE + 1),
-				Vector2(CELL_SIZE - 2, CELL_SIZE - 2)
 			)
+		draw_rect(pr, COLOR_WALL, false, WALL_W)
+		
+		for door in room.door_cells:
+			var dr := _cell_rect(door)
 			draw_rect(dr, COLOR_CORRIDOR)
+			var inner := dr.grow(-6)
+			draw_rect(inner, Color(0.95, 0.75, 0.10), false, 2.0)
 
 func _draw_centre_marker() -> void:
 	var cx: int = 10
@@ -223,8 +223,11 @@ func _draw_room_labels() -> void:
 			draw_string(font, pos, t, HORIZONTAL_ALIGNMENT_LEFT, -1, size, COLOR_LABEL)
 
 func _draw_highlights() -> void:
-	for c in _highlighted_cells:
-		draw_rect(_cell_rect(c), COLOR_HIGHLIGHT)
+	for cell in _highlighted_cells:
+		var r = _cell_rect(cell)
+		draw_rect(r, COLOR_HIGHLIGHT)
+		draw_rect(r, COLOR_HIGHLIGHT_BORDER, false, 2.0)
+
 
 func _cell_rect(cell: Vector2i) -> Rect2:
 	return Rect2(cell.x * CELL_SIZE, cell.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
