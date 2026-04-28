@@ -174,5 +174,12 @@ layout_mode = 2
 [node name="PlayerLabel" type="Label" parent="UI/HandPanel/VBox" unique_id=1967169306]
 layout_mode = 2
 
-[node name="CardsHBox" type="HBoxContainer" parent="UI/HandPanel/VBox" unique_id=161522672]
+[node name="ToggleButton" type="Button" parent="UI/HandPanel/VBox" unique_id=2093383794]
+layout_mode = 2
+text = "Hide cards"
+
+[node name="CardsContainer" type="MarginContainer" parent="UI/HandPanel/VBox" unique_id=869436138]
+layout_mode = 2
+
+[node name="CardsHBox" type="HBoxContainer" parent="UI/HandPanel/VBox/CardsContainer" unique_id=161522672]
 layout_mode = 2

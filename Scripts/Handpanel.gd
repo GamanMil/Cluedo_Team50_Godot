@@ -1,9 +1,15 @@
 extends PanelContainer
 
-@onready var player_label = $VBox/PlayerLabel
-@onready var cards_hbox   = $VBox/CardsHBox
+@onready var player_label  = $VBox/PlayerLabel
+@onready var cards_hbox    = $VBox/CardsContainer/CardsHBox
+@onready var toggle_button = $VBox/ToggleButton
+@onready var cards_container = $VBox/CardsContainer
+
+var _is_collapsed := false
 
 func _ready() -> void:
+	toggle_button.pressed.connect(_on_toggle)
+	custom_minimum_size = Vector2(600, 140)
 	hide()
 
 func show_hand(player) -> void:
@@ -13,40 +19,48 @@ func show_hand(player) -> void:
 		child.queue_free()
 
 	for card in player.hand:
-		var label = PanelContainer.new()
-		var vbox  = VBoxContainer.new()
+		var panel      = PanelContainer.new()
+		var vbox       = VBoxContainer.new()
 		var name_label = Label.new()
 		var type_label = Label.new()
 
-		name_label.text = card.card_name
-		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD
+		name_label.text                    = card.card_name
+		name_label.horizontal_alignment    = HORIZONTAL_ALIGNMENT_CENTER
+		name_label.autowrap_mode           = TextServer.AUTOWRAP_WORD
+		name_label.custom_minimum_size     = Vector2(80, 0)
 
-		type_label.text = _type_string(card.type)
-		type_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		type_label.text                    = _type_string(card.type)
+		type_label.horizontal_alignment    = HORIZONTAL_ALIGNMENT_CENTER
 
-		var style = StyleBoxFlat.new()
-		style.bg_color = _card_color(card.type)
-		style.corner_radius_top_left     = 6
-		style.corner_radius_top_right    = 6
-		style.corner_radius_bottom_left  = 6
-		style.corner_radius_bottom_right = 6
-		style.content_margin_left   = 8
-		style.content_margin_right  = 8
-		style.content_margin_top    = 8
-		style.content_margin_bottom = 8
-		label.add_theme_stylebox_override("panel", style)
-		label.custom_minimum_size = Vector2(80, 90)
+		var style                          = StyleBoxFlat.new()
+		style.bg_color                     = _card_color(card.type)
+		style.corner_radius_top_left       = 6
+		style.corner_radius_top_right      = 6
+		style.corner_radius_bottom_left    = 6
+		style.corner_radius_bottom_right   = 6
+		style.content_margin_left          = 8
+		style.content_margin_right         = 8
+		style.content_margin_top           = 8
+		style.content_margin_bottom        = 8
+		panel.add_theme_stylebox_override("panel", style)
+		panel.custom_minimum_size          = Vector2(85, 90)
 
 		vbox.add_child(name_label)
 		vbox.add_child(type_label)
-		label.add_child(vbox)
-		cards_hbox.add_child(label)
+		panel.add_child(vbox)
+		cards_hbox.add_child(panel)
 
+	cards_container.visible = not _is_collapsed
+	toggle_button.text      = "Hide Cards" if not _is_collapsed else "Show Cards"
 	show()
 
 func hide_hand() -> void:
 	hide()
+
+func _on_toggle() -> void:
+	_is_collapsed            = not _is_collapsed
+	cards_container.visible  = not _is_collapsed
+	toggle_button.text       = "Hide Cards" if not _is_collapsed else "Show Cards"
 
 func _type_string(type) -> String:
 	match type:
