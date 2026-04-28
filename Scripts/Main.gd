@@ -10,6 +10,7 @@ extends Node2D
 @onready var accusation_panel = $UI/AccusationPanel
 @onready var accuse_button    = $UI/AccuseButton
 @onready var hand_panel = $UI/HandPanel
+@onready var win_screen = $UI/WinScreen
 
 func _ready() -> void:
 	var data = game_manager._load_data("res://Resources/clue_data.json")
@@ -42,6 +43,7 @@ func _ready() -> void:
 	accusation_panel.accusation_cancelled.connect(_on_accusation_cancelled)
 	accuse_button.visible = false
 	turn_manager.game_over.connect(_on_game_over)
+	win_screen.play_again.connect(_on_play_again)
 
 
 func _on_card_shown(card_name: String) -> void:
@@ -112,9 +114,19 @@ func _on_accusation_cancelled() -> void:
 func _on_game_over(winner, was_correct: bool) -> void:
 	roll_button.visible   = false
 	accuse_button.visible = false
+	hand_panel.hide_hand()
 	if winner == null:
-		hud.text = "Nobody won — all players eliminated!"
+		win_screen.show_no_winner()
 	elif was_correct:
-		hud.text = "%s solved the murder! Game over!" % winner.player_name
+		var s = game_manager.solution
+		win_screen.show_win(
+			winner.player_name,
+			s["suspect"].card_name,
+			s["weapon"].card_name,
+			s["room"].card_name
+			)
 	else:
-		hud.text = "%s made a wrong accusation and is eliminated!" % winner.player_name
+		win_screen.show_loss(winner.player_name)
+
+func _on_play_again() -> void:
+	get_tree().reload_current_scene()
