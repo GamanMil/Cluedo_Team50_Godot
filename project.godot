@@ -11,9 +11,13 @@ config_version=5
 [application]
 
 config/name="Cluedo"
-run/main_scene="uid://cf7hyoxdf7x1"
+run/main_scene="uid://dq43djdf4ckgn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+GameState="*uid://bjxpt8jxyw4kt"
 
 [physics]
 
