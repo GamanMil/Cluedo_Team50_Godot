@@ -260,6 +260,11 @@ func _get_reachable_cells(from: Vector2i, steps: int) -> Array[Vector2i]:
 	var queue:          Array           = []
 	var occupied:       Dictionary      = _get_occupied_corridor_cells()
 	var from_room_name: String          = _room_cells.get(from, "")
+	
+	if from_room_name != "":
+		reachable.append(rooms[from_room_name].centre_cell())
+	else:
+		reachable.append(from)
 
 	if from_room_name != "":
 		var from_room: BoardRoomData = rooms[from_room_name]
