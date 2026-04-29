@@ -73,6 +73,7 @@ var _room_cells:       Dictionary         = {}
 var _door_lookup:      Dictionary         = {}
 var _highlighted_cells: Array[Vector2i]  = []
 var _active_token:     BoardToken         = null
+var _game_manager: Node = null
 
 func _ready() -> void:
 	_define_rooms()
@@ -81,8 +82,9 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_fit_to_viewport)
 	queue_redraw()
 
-func setup_board(players: Array) -> void:
-	_spawn_tokens(players)
+func setup_board(gm: Node) -> void:
+	_game_manager = gm
+	_spawn_all_tokens()
 	queue_redraw()
 
 func _fit_to_viewport() -> void:
@@ -129,7 +131,6 @@ func _build_lookups() -> void:
 			_room_cells[cell] = room.room_name
 		for door in room.door_cells:
 			_door_lookup[door] = room.room_name
-
 func _draw() -> void:
 	_draw_background()
 	_draw_cells()
@@ -137,8 +138,10 @@ func _draw() -> void:
 	_draw_room_outlines()
 	_draw_centre_marker()
 	_draw_room_labels()
+	_draw_weapons()
 	_draw_highlights()
 	_draw_grid_lines()
+
 
 func _draw_background() -> void:
 	var board_px := Vector2(COLS * CELL_SIZE, ROWS * CELL_SIZE)
@@ -232,15 +235,65 @@ func _room_cell_bounds(room: BoardRoomData) -> Rect2i:
 		mx = Vector2i(max(mx.x, c.x), max(mx.y, c.y))
 	return Rect2i(mn, mx - mn + Vector2i.ONE)
 
-func _spawn_tokens(players: Array) -> void:
-	for player in players:
-		var token          := BoardToken.new()
+
+func _draw_weapons() -> void:
+	if _game_manager == null:
+		return
+		
+	var font := ThemeDB.fallback_font
+	var fsize := 11
+	var rooms_to_weapons := {}
+	for weapon_name in _game_manager.weapon_locations.keys():
+		var room = _game_manager.weapon_locations[weapon_name]
+		if not rooms_to_weapons.has(room):
+			rooms_to_weapons[room] = []
+		rooms_to_weapons[room].append(weapon_name)
+	for room_name in rooms_to_weapons.keys():
+		if not rooms.has(room_name):
+			continue
+		var room: BoardRoomData = rooms[room_name]
+		var b := _room_cell_bounds(room)
+		var center_x: float = (b.position.x + b.size.x * 0.5) * CELL_SIZE
+		var start_y: float = (b.position.y + b.size.y) * CELL_SIZE - (rooms_to_weapons[room_name].size() * 12) - 5
+		
+		for i in range(rooms_to_weapons[room_name].size()):
+			var weapon_str = "🔪 " + rooms_to_weapons[room_name][i]
+			var tw := font.get_string_size(weapon_str, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize).x
+			var pos := Vector2(center_x - tw * 0.5, start_y + (i * 12))
+			draw_string(font, pos, weapon_str, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, Color(0.9, 0.9, 0.9))
+			
+func _spawn_all_tokens() -> void:
+	var active_suspects := []
+	for player in _game_manager.players:
+		active_suspects.append(player.suspect_name)
+		var token := BoardToken.new()
 		token.suspect_name = player.suspect_name
 		token.set_color(TOKEN_COLORS.get(player.suspect_name, Color.GRAY))
 		add_child(token)
 		tokens[player.suspect_name] = token
+		
 		var start: Vector2i = STARTING_CELLS.get(player.suspect_name, Vector2i(12, 12))
 		token.move_to_cell(start, "", self)
+
+	var spare_suspects := []
+	for card in _game_manager.all_suspect_cards:
+		if not active_suspects.has(card.card_name):
+			spare_suspects.append(card.card_name)
+			
+	var available_rooms = rooms.keys()
+	available_rooms.shuffle()
+	
+	for i in range(spare_suspects.size()):
+		var s_name = spare_suspects[i]
+		var token := BoardToken.new()
+		token.suspect_name = s_name
+		token.set_color(TOKEN_COLORS.get(s_name, Color.GRAY))
+		add_child(token)
+		tokens[s_name] = token
+		
+		var room_name = available_rooms[i % available_rooms.size()]
+		var room: BoardRoomData = rooms[room_name]
+		token.move_to_cell(room.centre_cell(), room_name, self)
 
 func highlight_reachable_cells(suspect_name: String, steps: int) -> void:
 	_active_token = tokens.get(suspect_name, null)

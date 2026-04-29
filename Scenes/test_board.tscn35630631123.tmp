@@ -1,0 +1,212 @@
+[gd_scene format=3 uid="uid://cf7hyoxdf7x1"]
+
+[ext_resource type="Script" uid="uid://wa25nkvrp5ts" path="res://Scripts/Main.gd" id="1_4yq3r"]
+[ext_resource type="Script" uid="uid://r2x1faywsx8c" path="res://Scripts/Board.gd" id="1_dct37"]
+[ext_resource type="Script" uid="uid://g4xvf33pcbjo" path="res://Scripts/GameManager.gd" id="3_a83bs"]
+[ext_resource type="Script" uid="uid://drcddidua12iu" path="res://Scripts/TurnManager.gd" id="4_nafu8"]
+[ext_resource type="Script" uid="uid://bgts46tdiv6cn" path="res://Scripts/SuggestionPanel.gd" id="5_a83bs"]
+[ext_resource type="Script" uid="uid://q8lr3bkuodv0" path="res://Scripts/Disprovepanel.gd" id="6_nafu8"]
+[ext_resource type="Script" uid="uid://1bid6102py0l" path="res://Scripts/Accusationpanel.gd" id="7_xkklf"]
+[ext_resource type="Script" uid="uid://cro7qm622d5ht" path="res://Scripts/Handpanel.gd" id="8_1ooi1"]
+[ext_resource type="Script" uid="uid://c1y57rljc2h76" path="res://Scripts/WinScreen.gd" id="9_6b6oi"]
+
+[node name="Main" type="Node2D" unique_id=1362361515]
+script = ExtResource("1_4yq3r")
+
+[node name="test_board" type="Node2D" parent="." unique_id=887743397]
+script = ExtResource("1_dct37")
+
+[node name="GameManager" type="Node" parent="." unique_id=1970479132]
+script = ExtResource("3_a83bs")
+
+[node name="TurnManager" type="Node" parent="." unique_id=1424361785]
+script = ExtResource("4_nafu8")
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1886595960]
+
+[node name="Button" type="Button" parent="UI" unique_id=2041751662]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -576.0
+offset_top = -28.0
+offset_right = -503.0
+offset_bottom = 3.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Roll dice
+"
+
+[node name="HUD" type="Label" parent="UI" unique_id=1107942333]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -576.0
+offset_right = -504.0
+offset_bottom = 23.0
+grow_horizontal = 2
+text = "Waiting..."
+
+[node name="SuggestionPanel" type="PanelContainer" parent="UI" unique_id=1734241584]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -57.0
+offset_top = -53.0
+offset_right = 243.0
+offset_bottom = 147.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_a83bs")
+
+[node name="VBox" type="VBoxContainer" parent="UI/SuggestionPanel" unique_id=349700170]
+layout_mode = 2
+
+[node name="RoomLabel" type="Label" parent="UI/SuggestionPanel/VBox" unique_id=2112530712]
+layout_mode = 2
+
+[node name="SuspectOption" type="OptionButton" parent="UI/SuggestionPanel/VBox" unique_id=104044919]
+layout_mode = 2
+
+[node name="WeaponOption" type="OptionButton" parent="UI/SuggestionPanel/VBox" unique_id=1681449831]
+layout_mode = 2
+
+[node name="Buttons" type="HBoxContainer" parent="UI/SuggestionPanel/VBox" unique_id=1745574429]
+layout_mode = 2
+
+[node name="ConfirmButton" type="Button" parent="UI/SuggestionPanel/VBox/Buttons" unique_id=1089267820]
+layout_mode = 2
+text = "Suggest"
+
+[node name="SkipButton" type="Button" parent="UI/SuggestionPanel/VBox/Buttons" unique_id=116964591]
+layout_mode = 2
+text = "Skip"
+
+[node name="DisprovePanel" type="PanelContainer" parent="UI" unique_id=544608893]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -125.0
+offset_top = -75.0
+offset_right = 125.0
+offset_bottom = 75.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("6_nafu8")
+
+[node name="VBox" type="VBoxContainer" parent="UI/DisprovePanel" unique_id=2011750390]
+layout_mode = 2
+
+[node name="PromptLabel" type="Label" parent="UI/DisprovePanel/VBox" unique_id=1255845769]
+layout_mode = 2
+
+[node name="CardsVBox" type="VBoxContainer" parent="UI/DisprovePanel/VBox" unique_id=240661912]
+layout_mode = 2
+
+[node name="NoCardsLabel" type="Label" parent="UI/DisprovePanel/VBox" unique_id=611896474]
+layout_mode = 2
+text = "No matching cards"
+
+[node name="AccusationPanel" type="PanelContainer" parent="UI" unique_id=1531674981]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -63.0
+offset_top = -51.5
+offset_right = 237.0
+offset_bottom = 168.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("7_xkklf")
+
+[node name="VBox" type="VBoxContainer" parent="UI/AccusationPanel" unique_id=963961528]
+layout_mode = 2
+
+[node name="SuspectOption" type="OptionButton" parent="UI/AccusationPanel/VBox" unique_id=254382647]
+layout_mode = 2
+
+[node name="WeaponOption" type="OptionButton" parent="UI/AccusationPanel/VBox" unique_id=1833918909]
+layout_mode = 2
+
+[node name="RoomOption" type="OptionButton" parent="UI/AccusationPanel/VBox" unique_id=736120164]
+layout_mode = 2
+
+[node name="Buttons" type="HBoxContainer" parent="UI/AccusationPanel/VBox" unique_id=1545907860]
+layout_mode = 2
+
+[node name="ConfirmButton" type="Button" parent="UI/AccusationPanel/VBox/Buttons" unique_id=85014716]
+layout_mode = 2
+text = "Accuse"
+
+[node name="CancelButton" type="Button" parent="UI/AccusationPanel/VBox/Buttons" unique_id=726665543]
+layout_mode = 2
+text = "Cancel"
+
+[node name="AccuseButton" type="Button" parent="UI" unique_id=220109705]
+offset_right = 8.0
+offset_bottom = 8.0
+text = "Make Accusation
+"
+
+[node name="HandPanel" type="PanelContainer" parent="UI" unique_id=1134470460]
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -40.0
+offset_top = -20.0
+offset_bottom = 20.0
+grow_horizontal = 0
+grow_vertical = 2
+script = ExtResource("8_1ooi1")
+
+[node name="VBox" type="VBoxContainer" parent="UI/HandPanel" unique_id=1910747925]
+layout_mode = 2
+
+[node name="PlayerLabel" type="Label" parent="UI/HandPanel/VBox" unique_id=1967169306]
+layout_mode = 2
+
+[node name="ToggleButton" type="Button" parent="UI/HandPanel/VBox" unique_id=2093383794]
+layout_mode = 2
+text = "Hide cards"
+
+[node name="CardsContainer" type="MarginContainer" parent="UI/HandPanel/VBox" unique_id=869436138]
+layout_mode = 2
+
+[node name="CardsHBox" type="HBoxContainer" parent="UI/HandPanel/VBox/CardsContainer" unique_id=161522672]
+layout_mode = 2
+
+[node name="WinScreen" type="PanelContainer" parent="UI" unique_id=1066610696]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("9_6b6oi")
+
+[node name="VBox" type="VBoxContainer" parent="UI/WinScreen" unique_id=1780106230]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="UI/WinScreen/VBox" unique_id=301964303]
+layout_mode = 2
+
+[node name="MessageLabel" type="Label" parent="UI/WinScreen/VBox" unique_id=705763828]
+layout_mode = 2
+
+[node name="AgainButton" type="Button" parent="UI/WinScreen/VBox" unique_id=90454737]
+layout_mode = 2

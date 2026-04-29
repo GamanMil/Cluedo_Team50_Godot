@@ -82,7 +82,13 @@ func _build_playing_deck(suspects: Array[ClueCard], weapons: Array[ClueCard], ro
 	deck.append_array(rooms)
 	deck.shuffle()
 	return deck
-
+	
+func move_weapon_to_room(weapon_name: String, room_name: String) -> void:
+	if weapon_locations.has(weapon_name):
+		weapon_locations[weapon_name] = room_name
+		var board = get_node_or_null("/root/Main/test_board")
+		if board:
+			board.queue_redraw()
 const AIPlayerScript = preload("res://Scripts/aiplayer.gd")
 
 func _create_players(player_count: int, ai_count: int) -> void:

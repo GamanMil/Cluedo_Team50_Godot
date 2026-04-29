@@ -27,7 +27,7 @@ func _ready() -> void:
 	turn_manager.dice_rolled.connect(_on_dice_rolled)
 	roll_button.visible = false
 
-	board.setup_board(game_manager.players)
+	board.setup_board(game_manager)
 	turn_manager.start_game(game_manager, board)
 	suggestion_panel.populate(game_manager.all_suspect_cards, game_manager.all_weapon_cards)
 	turn_manager.suggestion_phase_started.connect(_on_suggestion_phase_started)
