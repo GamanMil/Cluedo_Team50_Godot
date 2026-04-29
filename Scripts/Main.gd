@@ -15,7 +15,10 @@ extends Node2D
 func _ready() -> void:
 	var data = game_manager._load_data("res://Resources/clue_data.json")
 	game_manager._generate_all_cards(data)
-	game_manager.setup_game(3, 0)
+	if GameState.play_mode == GameState.PLAY_VS_AI:
+		game_manager.setup_game(3, 2)
+	else:
+		game_manager.setup_game(3, 0)
 	
 	game_manager.turn_manager_ref = turn_manager
 	roll_button.pressed.connect(turn_manager.action_roll_dice)
@@ -45,7 +48,6 @@ func _ready() -> void:
 	turn_manager.game_over.connect(_on_game_over)
 	win_screen.play_again.connect(_on_play_again)
 
-
 func _on_card_shown(card_name: String) -> void:
 	if card_name != "":
 		hud.text = "A card was shown privately"
@@ -54,8 +56,20 @@ func _on_card_shown(card_name: String) -> void:
 		turn_manager.finish_suggestion()
 	
 func _on_disprove_requested(player_name: String, matching_cards: Array) -> void:
-	hud.text = "%s is disproving..." % player_name
-	disprove_panel.show_for_player(player_name, matching_cards)
+	var disproving_player = game_manager.get_player_by_name(player_name)
+	
+	if disproving_player and disproving_player is AIPlayer:
+		hud.text = "%s is thinking..." % player_name
+		await get_tree().create_timer(1.5).timeout
+		
+		var chosen_card = disproving_player.choose_card_to_show(matching_cards)
+		if chosen_card:
+			_on_card_shown(chosen_card.card_name)
+		else:
+			_on_card_shown("")
+	else:
+		hud.text = "%s is disproving..." % player_name
+		disprove_panel.show_for_player(player_name, matching_cards)
 	
 func _on_suggestion_phase_started(room_name: String) -> void:
 	hud.text = "Make a suggestion — you are in the %s" % room_name
@@ -71,25 +85,41 @@ func _on_suggestion_skipped() -> void:
 	
 func _on_turn_started(player) -> void:
 	hud.text = "%s's turn" % player.player_name
-	roll_button.visible = true
-	hand_panel.show_hand(player)
+	
+	if player.is_human:
+		roll_button.visible = true
+		hand_panel.show_hand(player)
+	else:
+		roll_button.visible = false
+		hand_panel.hide() 
+		
+		await get_tree().create_timer(1.0).timeout
+		turn_manager.action_roll_dice()
 
 func _on_phase_changed(phase) -> void:
+	var current_player = turn_manager._current_player()
+	var is_ai = current_player is AIPlayer
 	match phase:
 		TurnManager.Phase.ROLL:
-			roll_button.visible   = true
+			roll_button.visible   = not is_ai
 			accuse_button.visible = false
 		TurnManager.Phase.MOVE:
 			roll_button.visible   = false
 			accuse_button.visible = false
-			hud.text = hud.text + " — click a highlighted cell to move"
+			if not is_ai:
+				hud.text = hud.text + " — click a highlighted cell to move"
+			else:
+				hud.text = hud.text + " — AI is moving..."
+				await get_tree().create_timer(1.0).timeout
+				var chosen_cell = current_player.choose_move(board._highlighted_cells)
+				
+				if chosen_cell != null:
+					board.execute_move(chosen_cell)
+				else:
+					turn_manager._end_turn()	
 		TurnManager.Phase.SUGGEST:
-			accuse_button.visible = true
-		TurnManager.Phase.END_TURN:
-			roll_button.visible   = false
-			accuse_button.visible = false
-			hand_panel.hide_hand() 
-
+			pass
+			
 func _on_dice_rolled(total, die1, die2) -> void:
 	hud.text = hud.text + " — rolled %d + %d = %d" % [die1, die2, total]
 	print("Dice rolled, highlighting cells for: ", turn_manager._current_player().suspect_name)

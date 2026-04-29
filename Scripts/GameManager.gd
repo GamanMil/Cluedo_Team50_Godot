@@ -83,26 +83,39 @@ func _build_playing_deck(suspects: Array[ClueCard], weapons: Array[ClueCard], ro
 	deck.shuffle()
 	return deck
 
+const AIPlayerScript = preload("res://Scripts/aiplayer.gd")
+
 func _create_players(player_count: int, ai_count: int) -> void:
 	players.clear()
 	var total_suspects = all_suspect_cards.size()  # always 6
 
 	for i in range(total_suspects):
 		var suspect_card = all_suspect_cards[i]
-		var p            = Player.new()
+		
+		# Determine roles first
+		var is_spare_val = false
+		var is_human_val = false
+		
+		if i < player_count:
+			is_spare_val = false
+			is_human_val = (i >= player_count - ai_count) == false
+		else:
+			is_spare_val = true
+			is_human_val = false
+
+		var p
+		if not is_spare_val and not is_human_val:
+			p = AIPlayerScript.new()
+		else:
+			p = Player.new()
+
 		p.player_id      = i
 		p.suspect_name   = suspect_card.card_name
 		p.player_name    = suspect_card.card_name 
-
-		if i < player_count:
-			p.is_spare  = false
-			p.is_human  = (i >= player_count - ai_count) == false
-		else:
-			p.is_spare  = true
-			p.is_human  = false
+		p.is_spare       = is_spare_val
+		p.is_human       = is_human_val
 
 		players.append(p)
-
 func _deal_cards(deck: Array[ClueCard]) -> void:
 	var active = players.filter(func(p): return not p.is_spare)
 	var index  := 0

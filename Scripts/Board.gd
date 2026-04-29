@@ -383,3 +383,18 @@ func move_token_to_room(suspect_name: String, room_name: String) -> void:
 func get_token_room(suspect_name: String) -> String:
 	var token = tokens.get(suspect_name, null)
 	return token.current_room if token != null else ""
+	
+func execute_move(cell: Vector2i) -> void:
+	if _active_token == null:
+		return
+	if cell not in _highlighted_cells:
+		return
+
+	var room_name: String = _room_cells.get(cell, "")
+	_active_token.move_to_cell(cell, room_name, self)
+	_clear_highlights()
+
+	if room_name != "":
+		emit_signal("player_entered_room", room_name)
+	else:
+		emit_signal("player_entered_corridor")

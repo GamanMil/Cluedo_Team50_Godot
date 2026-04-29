@@ -1,10 +1,10 @@
 extends Player
 class_name AIPlayer
 
-func choose_move(reachable_rooms: Array) -> String:
-	if reachable_rooms.is_empty():
-		return ""
-	return reachable_rooms[randi() % reachable_rooms.size()]
+func choose_move(reachable_cells: Array) -> Variant:
+	if reachable_cells.is_empty():
+		return null
+	return reachable_cells[randi() % reachable_cells.size()]
 
 func choose_suggestion(all_suspects: Array[ClueCard], all_weapons: Array[ClueCard]) -> Dictionary:
 	var unknown_suspects = all_suspects.filter(func(c): return not _in_hand(c))
