@@ -11,6 +11,7 @@ extends Node2D
 @onready var accuse_button    = $UI/AccuseButton
 @onready var hand_panel = $UI/HandPanel
 @onready var win_screen = $UI/WinScreen
+@onready var hand_toggle_button = $UI/HandToggleButton
 
 func _ready() -> void:
 	var data = game_manager._load_data("res://Resources/clue_data.json")
@@ -47,6 +48,7 @@ func _ready() -> void:
 	accuse_button.visible = false
 	turn_manager.game_over.connect(_on_game_over)
 	win_screen.play_again.connect(_on_play_again)
+	hand_toggle_button.pressed.connect(_on_hand_toggle_pressed)
 
 func _on_card_shown(card_name: String) -> void:
 	if card_name != "":
@@ -170,3 +172,7 @@ func _on_game_over(winner, was_correct: bool) -> void:
 
 func _on_play_again() -> void:
 	get_tree().reload_current_scene()
+
+func _on_hand_toggle_pressed() -> void:
+	hand_panel.toggle_hand_visibility()
+	hand_toggle_button.text = "Hide Cards" if hand_panel.visible else "Show Cards"

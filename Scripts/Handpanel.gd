@@ -2,22 +2,19 @@ extends PanelContainer
 
 @onready var player_label  = $VBox/PlayerLabel
 @onready var cards_hbox    = $VBox/CardsContainer/CardsHBox
-@onready var toggle_button = $VBox/ToggleButton
 @onready var cards_container = $VBox/CardsContainer
 
 var _is_collapsed := false
 
 func _ready() -> void:
-	toggle_button.pressed.connect(_on_toggle)
 	custom_minimum_size = Vector2(600, 140)
 	hide()
 
 func show_hand(player) -> void:
 	player_label.text = "%s's cards" % player.player_name
-
+	show()
 	for child in cards_hbox.get_children():
 		child.queue_free()
-
 	for card in player.hand:
 		var panel      = PanelContainer.new()
 		var vbox       = VBoxContainer.new()
@@ -49,18 +46,19 @@ func show_hand(player) -> void:
 		vbox.add_child(type_label)
 		panel.add_child(vbox)
 		cards_hbox.add_child(panel)
-
 	cards_container.visible = not _is_collapsed
-	toggle_button.text      = "Hide Cards" if not _is_collapsed else "Show Cards"
 	show()
+
 
 func hide_hand() -> void:
 	hide()
 
-func _on_toggle() -> void:
-	_is_collapsed            = not _is_collapsed
-	cards_container.visible  = not _is_collapsed
-	toggle_button.text       = "Hide Cards" if not _is_collapsed else "Show Cards"
+func toggle_hand_visibility() -> void:
+	_is_collapsed = not _is_collapsed
+	if _is_collapsed:
+		hide()
+	else:
+		show()
 
 func _type_string(type) -> String:
 	match type:
