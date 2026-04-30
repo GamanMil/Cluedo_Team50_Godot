@@ -101,9 +101,11 @@ func _on_turn_started(player) -> void:
 	if player.is_human:
 		roll_button.visible = true
 		hand_panel.show_hand(player)
+		hand_toggle_button.text = "Hide Cards"
 	else:
 		roll_button.visible = false
-		hand_panel.hide()  
+		hand_panel.hide()
+		hand_toggle_button.text = "Show Cards"
 		await get_tree().create_timer(1.0).timeout
 		turn_manager.action_roll_dice()
 
@@ -156,6 +158,7 @@ func _on_game_over(winner, was_correct: bool) -> void:
 	roll_button.visible   = false
 	accuse_button.visible = false
 	hand_panel.hide_hand()
+	hand_toggle_button.text = "Show Cards"
 	if winner == null:
 		win_screen.show_no_winner()
 	elif was_correct:
