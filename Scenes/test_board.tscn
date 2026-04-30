@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://1bid6102py0l" path="res://Scripts/Accusationpanel.gd" id="7_xkklf"]
 [ext_resource type="Script" uid="uid://cro7qm622d5ht" path="res://Scripts/Handpanel.gd" id="8_1ooi1"]
 [ext_resource type="Script" uid="uid://c1y57rljc2h76" path="res://Scripts/WinScreen.gd" id="9_6b6oi"]
+[ext_resource type="PackedScene" uid="uid://e3o5qv111sr0" path="res://Scenes/DetectiveNotepad.tscn" id="10_xg5qb"]
 
 [node name="Main" type="Node2D" unique_id=1362361515]
 script = ExtResource("1_4yq3r")
@@ -217,3 +218,5 @@ offset_right = 1067.6909
 offset_bottom = 584.5251
 scale = Vector2(1.3, 1.3)
 text = "Hide cards"
+
+[node name="DetectiveNotepad" parent="." unique_id=235557451 instance=ExtResource("10_xg5qb")]
