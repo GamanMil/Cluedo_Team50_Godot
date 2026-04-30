@@ -157,7 +157,13 @@ func get_suspect_card_by_name(suspect_name: String) -> ClueCard:
 		if card.card_name == suspect_name:
 			return card
 	return null
-
+	
+func get_player_by_name(player_name: String) -> Player:
+	for player in players:
+		if player.player_name == player_name:
+			return player
+	return null
+	
 func get_weapon_card_by_name(weapon_name: String) -> ClueCard:
 	for card in all_weapon_cards:
 		if card.card_name == weapon_name:
