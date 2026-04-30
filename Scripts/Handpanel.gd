@@ -46,9 +46,9 @@ func show_hand(player) -> void:
 		vbox.add_child(type_label)
 		panel.add_child(vbox)
 		cards_hbox.add_child(panel)
-	cards_container.visible = not _is_collapsed
-	show()
-
+		cards_hbox.add_child(panel)
+		cards_container.visible = not _is_collapsed
+		show()
 
 func hide_hand() -> void:
 	hide()
