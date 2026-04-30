@@ -6,10 +6,12 @@ extends PanelContainer
 
 var _is_collapsed := false
 
+##sets the initial dimensions and hides the panel on startup
 func _ready() -> void:
 	custom_minimum_size = Vector2(600, 140)
 	hide()
 
+##clears previous cards and visually generates the player's current hand
 func show_hand(player) -> void:
 	player_label.text = "%s's cards" % player.player_name
 	show()
@@ -51,10 +53,12 @@ func show_hand(player) -> void:
 		show()
 		_is_collapsed = false
 
+##hides the panel and marks the hand as collapsed
 func hide_hand() -> void:
 	hide()
 	_is_collapsed = true
 
+##switches the visibility state of the card display panel
 func toggle_hand_visibility() -> void:
 	_is_collapsed = not _is_collapsed
 	if _is_collapsed:
@@ -62,6 +66,7 @@ func toggle_hand_visibility() -> void:
 	else:
 		show()
 
+##converts the card type enum into a readable string
 func _type_string(type) -> String:
 	match type:
 		ClueCard.CardType.SUSPECT: return "Suspect"
@@ -69,6 +74,7 @@ func _type_string(type) -> String:
 		ClueCard.CardType.ROOM:    return "Room"
 	return ""
 
+##returns a specific background color based on the card type
 func _card_color(type) -> Color:
 	match type:
 		ClueCard.CardType.SUSPECT: return Color(0.70, 0.20, 0.20)

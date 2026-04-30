@@ -13,11 +13,13 @@ var suspects: Array = []
 var weapons:  Array = []
 var rooms:    Array = []
 
+##connects button presses to the functions
 func _ready() -> void:
 	confirm_button.pressed.connect(_on_confirm)
 	cancel_button.pressed.connect(_on_cancel)
 	hide()
 
+##populates game's ui with the data
 func populate(suspect_cards: Array, weapon_cards: Array, room_cards: Array) -> void:
 	suspects = suspect_cards
 	weapons  = weapon_cards
@@ -35,6 +37,7 @@ func populate(suspect_cards: Array, weapon_cards: Array, room_cards: Array) -> v
 	for card in rooms:
 		room_option.add_item(card.card_name)
 
+##peforms player's chosen action when they click confirm
 func _on_confirm() -> void:
 	var suspect = suspects[suspect_option.selected].card_name
 	var weapon  = weapons[weapon_option.selected].card_name
@@ -42,6 +45,7 @@ func _on_confirm() -> void:
 	hide()
 	emit_signal("accusation_confirmed", suspect, weapon, room)
 
+##hides ui panel if player presses it
 func _on_cancel() -> void:
 	hide()
 	emit_signal("accusation_cancelled")

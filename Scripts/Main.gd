@@ -13,6 +13,7 @@ extends Node2D
 @onready var win_screen = $UI/WinScreen
 @onready var hand_toggle_button = $UI/HandToggleButton
 
+##initializes the game state, connects ui signals, and starts the first turn
 func _ready() -> void:
 	var data = game_manager._load_data("res://Resources/clue_data.json")
 	game_manager._generate_all_cards(data)
@@ -50,6 +51,7 @@ func _ready() -> void:
 	win_screen.play_again.connect(_on_play_again)
 	hand_toggle_button.pressed.connect(_on_hand_toggle_pressed)
 
+##updates the hud and resumes the turn after a card is shown or passed
 func _on_card_shown(card_name: String) -> void:
 	if card_name != "":
 		hud.text = "A card was shown privately"
@@ -57,6 +59,7 @@ func _on_card_shown(card_name: String) -> void:
 		hud.text = "No card to show — passing..."
 	turn_manager.finish_suggestion()
 	
+##handles the disprove logic for both ai and human players
 func _on_disprove_requested(player_name: String, matching_cards: Array) -> void:
 	var disproving_player = game_manager.get_player_by_name(player_name)
 	
@@ -73,6 +76,7 @@ func _on_disprove_requested(player_name: String, matching_cards: Array) -> void:
 		hud.text = "%s is disproving..." % player_name
 		disprove_panel.show_for_player(player_name, matching_cards)
 	
+##triggers ai suggestion logic or opens the suggestion menu for human players
 func _on_suggestion_phase_started(room_name: String) -> void:
 	var current_player = turn_manager._current_player()
 	if current_player is AIPlayer:
@@ -87,14 +91,17 @@ func _on_suggestion_phase_started(room_name: String) -> void:
 		hud.text = "Make a suggestion — you are in the %s" % room_name
 		suggestion_panel.show_for_room(room_name)
 
+##passes the confirmed suggestion data to the turn manager
 func _on_suggestion_confirmed(suspect_name: String, weapon_name: String) -> void:
 	var suspect = game_manager.get_suspect_card_by_name(suspect_name)
 	var weapon  = game_manager.get_weapon_card_by_name(weapon_name)
 	turn_manager.action_make_suggestion(suspect, weapon)
 
+##notifies the turn manager that the player declined to make a suggestion
 func _on_suggestion_skipped() -> void:
 	turn_manager.action_make_suggestion(null, null)
 	
+##updates the ui and player hand display at the start of a new turn
 func _on_turn_started(player) -> void:
 	hud.text = "%s's turn" % player.player_name
 	
@@ -109,6 +116,7 @@ func _on_turn_started(player) -> void:
 		await get_tree().create_timer(1.0).timeout
 		turn_manager.action_roll_dice()
 
+##updates visible ui elements and triggers ai actions based on the current phase
 func _on_phase_changed(phase) -> void:
 	var current_player = turn_manager._current_player()
 	var is_ai = current_player is AIPlayer
@@ -129,31 +137,36 @@ func _on_phase_changed(phase) -> void:
 				if chosen_cell != null:
 					board.execute_move(chosen_cell)
 				else:
-					turn_manager._end_turn()	
+					turn_manager._end_turn()    
 		TurnManager.Phase.SUGGEST:
 			pass
 			
+##updates the hud to show the result of the dice roll
 func _on_dice_rolled(total, die1, die2) -> void:
 	hud.text = hud.text + " — rolled %d + %d = %d" % [die1, die2, total]
 	print("Dice rolled, highlighting cells for: ", turn_manager._current_player().suspect_name)
 	print("Highlighted cells: ", board._highlighted_cells.size())
 	
+##switches the ui from the suggestion menu to the accusation menu
 func _on_accuse_button_pressed() -> void:
 	accuse_button.visible = false
 	suggestion_panel.hide()
 	accusation_panel.show()
 
+##passes the final accusation data to the turn manager
 func _on_accusation_confirmed(suspect_name: String, weapon_name: String, room_name: String) -> void:
 	var suspect = game_manager.get_suspect_card_by_name(suspect_name)
 	var weapon  = game_manager.get_weapon_card_by_name(weapon_name)
 	var room    = game_manager.get_room_card_by_name(room_name)
 	turn_manager.action_make_accusation(suspect, weapon, room)
 	
+##closes the accusation menu and reopens the suggestion menu if applicable
 func _on_accusation_cancelled() -> void:
 	accuse_button.visible = true
 	if turn_manager.current_room != "":
 		suggestion_panel.show_for_room(turn_manager.current_room)
 
+##hides gameplay ui and displays the appropriate win or loss screen
 func _on_game_over(winner, was_correct: bool) -> void:
 	roll_button.visible   = false
 	accuse_button.visible = false
@@ -172,9 +185,11 @@ func _on_game_over(winner, was_correct: bool) -> void:
 	else:
 		win_screen.show_loss(winner.player_name)
 
+##reloads the current scene to restart the game completely
 func _on_play_again() -> void:
 	get_tree().reload_current_scene()
 
+##toggles the visibility of the player's card hand and updates the button text
 func _on_hand_toggle_pressed() -> void:
 	hand_panel.toggle_hand_visibility()
 	hand_toggle_button.text = "Hide Cards" if hand_panel.visible else "Show Cards"

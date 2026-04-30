@@ -10,6 +10,7 @@ var door_cells: Array[Vector2i] = []
 
 var secret_passage_to: String = ""
 
+##calculates the average center grid coordinate of the room
 func centre_cell() -> Vector2i:
 	if cells.is_empty():
 		return Vector2i.ZERO

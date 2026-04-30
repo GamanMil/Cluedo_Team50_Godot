@@ -51,11 +51,12 @@ const TOKEN_COLORS := {
 }
 
 class BoardRoomData:
-	var room_name:        String            = ""
-	var cells:            Array[Vector2i]   = []
-	var door_cells:       Array[Vector2i]   = []
-	var secret_passage_to: String           = ""
+	var room_name:         String            = ""
+	var cells:             Array[Vector2i]   = []
+	var door_cells:        Array[Vector2i]   = []
+	var secret_passage_to: String            = ""
 
+	##calculates the center grid coordinate for the room
 	func centre_cell() -> Vector2i:
 		if cells.is_empty():
 			return Vector2i.ZERO
@@ -75,6 +76,7 @@ var _highlighted_cells: Array[Vector2i]  = []
 var _active_token:     BoardToken         = null
 var _game_manager: Node = null
 
+##initializes the board, builds lookups, and connects resize signals
 func _ready() -> void:
 	_define_rooms()
 	_build_lookups()
@@ -82,11 +84,13 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_fit_to_viewport)
 	queue_redraw()
 
+##sets the game manager and spawns all character tokens
 func setup_board(gm: Node) -> void:
 	_game_manager = gm
 	_spawn_all_tokens()
 	queue_redraw()
 
+##scales and centers the board to fit inside the current window
 func _fit_to_viewport() -> void:
 	var board_size := Vector2(COLS * CELL_SIZE, ROWS * CELL_SIZE)
 	var vp         := get_viewport_rect().size
@@ -96,18 +100,20 @@ func _fit_to_viewport() -> void:
 	scale          = Vector2(s, s)
 	position       = ((vp - board_size * s) * 0.5).round()
 
+##clears and defines the layout, doors, and passages for all rooms
 func _define_rooms() -> void:
 	rooms.clear()
-	_add_room("Study",        _rect(0, 0,   5,  6),  [Vector2i(6, 4),  Vector2i(4, 7)],                              "Kitchen")
-	_add_room("Hall",         _rect(9, 0,  14,  8),  [Vector2i(8, 4),  Vector2i(11, 9), Vector2i(13, 9)],            "")
-	_add_room("Lounge",       _rect(18, 0, 23,  6),  [Vector2i(17, 4)],                                              "Conservatory")
-	_add_room("Library",      _rect(0, 9,   5, 14),  [Vector2i(6, 12), Vector2i(3, 8)],                              "")
-	_add_room("Dining Room",  _rect(17, 10, 23, 17), [Vector2i(16, 13), Vector2i(16, 16)],                           "")
-	_add_room("Billiard Room",_rect(0, 16,  5, 21),  [Vector2i(6, 19), Vector2i(3, 15)],                             "")
-	_add_room("Conservatory", _rect(0, 23,  4, 24),  [Vector2i(5, 23)],                                              "Lounge")
-	_add_room("Ballroom",     _rect(8, 22, 15, 24),  [Vector2i(7, 23), Vector2i(10, 21), Vector2i(13, 21), Vector2i(16, 23)], "")
-	_add_room("Kitchen",      _rect(18, 22, 23, 24), [Vector2i(17, 23), Vector2i(20, 21)],                           "Study")
+	_add_room("Study",         _rect(0, 0,   5,  6),  [Vector2i(6, 4),  Vector2i(4, 7)],                             "Kitchen")
+	_add_room("Hall",          _rect(9, 0,  14,  8),  [Vector2i(8, 4),  Vector2i(11, 9), Vector2i(13, 9)],             "")
+	_add_room("Lounge",        _rect(18, 0, 23,  6),  [Vector2i(17, 4)],                                             "Conservatory")
+	_add_room("Library",       _rect(0, 9,   5, 14),  [Vector2i(6, 12), Vector2i(3, 8)],                               "")
+	_add_room("Dining Room",   _rect(17, 10, 23, 17), [Vector2i(16, 13), Vector2i(16, 16)],                            "")
+	_add_room("Billiard Room", _rect(0, 16,  5, 21),  [Vector2i(6, 19), Vector2i(3, 15)],                              "")
+	_add_room("Conservatory",  _rect(0, 23,  4, 24),  [Vector2i(5, 23)],                                             "Lounge")
+	_add_room("Ballroom",      _rect(8, 22, 15, 24),  [Vector2i(7, 23), Vector2i(10, 21), Vector2i(13, 21), Vector2i(16, 23)], "")
+	_add_room("Kitchen",       _rect(18, 22, 23, 24), [Vector2i(17, 23), Vector2i(20, 21)],                            "Study")
 
+##creates and stores data for a single room
 func _add_room(name: String, cells: Array[Vector2i], doors: Array[Vector2i], passage: String) -> void:
 	var r              = BoardRoomData.new()
 	r.room_name        = name
@@ -116,6 +122,7 @@ func _add_room(name: String, cells: Array[Vector2i], doors: Array[Vector2i], pas
 	r.secret_passage_to = passage
 	rooms[name]        = r
 
+##generates a list of grid coordinates forming a rectangle
 func _rect(x1: int, y1: int, x2: int, y2: int) -> Array[Vector2i]:
 	var out: Array[Vector2i] = []
 	for y in range(y1, y2 + 1):
@@ -123,6 +130,7 @@ func _rect(x1: int, y1: int, x2: int, y2: int) -> Array[Vector2i]:
 			out.append(Vector2i(x, y))
 	return out
 
+##populates lookup dictionaries for quick room and door access
 func _build_lookups() -> void:
 	_room_cells.clear()
 	_door_lookup.clear()
@@ -131,6 +139,8 @@ func _build_lookups() -> void:
 			_room_cells[cell] = room.room_name
 		for door in room.door_cells:
 			_door_lookup[door] = room.room_name
+
+##master function that triggers drawing of all visual board elements
 func _draw() -> void:
 	_draw_background()
 	_draw_cells()
@@ -142,11 +152,12 @@ func _draw() -> void:
 	_draw_highlights()
 	_draw_grid_lines()
 
-
+##draws the solid base background behind the entire board
 func _draw_background() -> void:
 	var board_px := Vector2(COLS * CELL_SIZE, ROWS * CELL_SIZE)
 	draw_rect(Rect2(Vector2(-8, -8), board_px + Vector2(16, 16)), COLOR_BG)
 
+##draws the colored grid cells for corridors and rooms
 func _draw_cells() -> void:
 	for y in range(ROWS):
 		for x in range(COLS):
@@ -159,6 +170,7 @@ func _draw_cells() -> void:
 			if _room_cells.has(c):
 				draw_rect(_cell_rect(c), ROOM_COLORS.get(_room_cells[c], Color.DIM_GRAY))
 
+##draws subtle outlines over the corridor cells
 func _draw_grid_lines() -> void:
 	for y in range(ROWS):
 		for x in range(COLS):
@@ -166,6 +178,7 @@ func _draw_grid_lines() -> void:
 			if not _room_cells.has(c):
 				draw_rect(_cell_rect(c), COLOR_GRID, false, 1.0)
 
+##renders door cells with colored borders and directional arrows
 func _draw_doors() -> void:
 	var font := ThemeDB.fallback_font
 	for door_cell in _door_lookup.keys():
@@ -185,12 +198,14 @@ func _draw_doors() -> void:
 		var base2  := mid - dir * (CELL_SIZE * 0.15) - Vector2(-dir.y, dir.x) * (CELL_SIZE * 0.15)
 		draw_colored_polygon(PackedVector2Array([tip, base1, base2]), COLOR_DOOR_ARROW)
 
+##draws thick borders encapsulating each room
 func _draw_room_outlines() -> void:
 	for room in rooms.values():
 		var b  := _room_cell_bounds(room)
 		var pr := Rect2(Vector2(b.position) * CELL_SIZE, Vector2(b.size) * CELL_SIZE)
 		draw_rect(pr, COLOR_WALL, false, WALL_W)
 
+##draws the central starting area graphic on the board
 func _draw_centre_marker() -> void:
 	var r := Rect2(Vector2(10, 12) * CELL_SIZE, Vector2(4, 4) * CELL_SIZE)
 	draw_rect(r, COLOR_CENTER_FILL)
@@ -199,6 +214,7 @@ func _draw_centre_marker() -> void:
 	draw_string(font, r.get_center() + Vector2(-6, 6), "X",
 		HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color.BLACK)
 
+##renders the text names in the middle of each room
 func _draw_room_labels() -> void:
 	var font  := ThemeDB.fallback_font
 	var fsize := 16
@@ -215,16 +231,20 @@ func _draw_room_labels() -> void:
 			var pos := center + Vector2(-tw * 0.5, -total_h * 0.5 + float(i) * lh + float(fsize))
 			draw_string(font, pos, t, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, COLOR_LABEL)
 
+##draws translucent overlays over cells a player can currently move to
 func _draw_highlights() -> void:
 	for c in _highlighted_cells:
 		draw_rect(_cell_rect(c), COLOR_HIGHLIGHT)
 
+##calculates the pixel rectangle for a given grid coordinate
 func _cell_rect(cell: Vector2i) -> Rect2:
 	return Rect2(cell.x * CELL_SIZE, cell.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
 
+##gets the local pixel position for the center of a given cell
 func map_to_local(cell: Vector2i) -> Vector2:
 	return Vector2(cell) * CELL_SIZE + Vector2(CELL_SIZE * 0.5, CELL_SIZE * 0.5)
 
+##calculates the rectangular bounding box containing a whole room
 func _room_cell_bounds(room: BoardRoomData) -> Rect2i:
 	if room.cells.is_empty():
 		return Rect2i()
@@ -236,6 +256,7 @@ func _room_cell_bounds(room: BoardRoomData) -> Rect2i:
 	return Rect2i(mn, mx - mn + Vector2i.ONE)
 
 
+##draws text displaying which weapons are currently in each room
 func _draw_weapons() -> void:
 	if _game_manager == null:
 		return
@@ -262,6 +283,7 @@ func _draw_weapons() -> void:
 			var pos := Vector2(center_x - tw * 0.5, start_y + (i * 12))
 			draw_string(font, pos, weapon_str, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize, Color(0.9, 0.9, 0.9))
 			
+##instantiates and places tokens for all active players and spares
 func _spawn_all_tokens() -> void:
 	var active_suspects := []
 	for player in _game_manager.players:
@@ -295,6 +317,7 @@ func _spawn_all_tokens() -> void:
 		var room: BoardRoomData = rooms[room_name]
 		token.move_to_cell(room.centre_cell(), room_name, self)
 
+##determines and visually highlights all valid movement destinations
 func highlight_reachable_cells(suspect_name: String, steps: int) -> void:
 	_active_token = tokens.get(suspect_name, null)
 	if _active_token == null:
@@ -302,11 +325,13 @@ func highlight_reachable_cells(suspect_name: String, steps: int) -> void:
 	_highlighted_cells = _get_reachable_cells(_active_token.current_cell, steps)
 	queue_redraw()
 
+##removes active movement highlights and clears the active token
 func _clear_highlights() -> void:
 	_highlighted_cells.clear()
 	_active_token = null
 	queue_redraw()
 
+##uses pathfinding to find all accessible cells within a given step count
 func _get_reachable_cells(from: Vector2i, steps: int) -> Array[Vector2i]:
 	var visited:        Dictionary      = {}
 	var reachable:      Array[Vector2i] = []
@@ -362,19 +387,23 @@ func _get_reachable_cells(from: Vector2i, steps: int) -> Array[Vector2i]:
 
 	return reachable
 
+##returns the four directly adjacent grid coordinates
 func _orthogonal_neighbours(cell: Vector2i) -> Array[Vector2i]:
 	return [cell + Vector2i(1,0), cell + Vector2i(-1,0),
 			cell + Vector2i(0,1), cell + Vector2i(0,-1)]
 
+##checks if a coordinate is strictly inside the board boundaries
 func _is_walkable(cell: Vector2i) -> bool:
 	return cell.x >= 0 and cell.x < COLS and cell.y >= 0 and cell.y < ROWS
 
+##retrieves the room data object associated with a specific cell
 func _room_for_cell(cell: Vector2i) -> BoardRoomData:
 	var name: String = _room_cells.get(cell, "") as String
 	if name == "":
 		return null
 	return rooms.get(name, null) as BoardRoomData
 
+##finds all corridor cells currently blocked by a character token
 func _get_occupied_corridor_cells() -> Dictionary:
 	var occ: Dictionary = {}
 	for token in tokens.values():
@@ -382,6 +411,7 @@ func _get_occupied_corridor_cells() -> Dictionary:
 			occ[token.current_cell] = true
 	return occ
 
+##processes mouse clicks to move the active token to highlighted cells
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventMouseButton:
 		return
@@ -412,6 +442,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	else:
 		emit_signal("player_entered_corridor")
 
+##checks if a character's current room has a secret passage and returns the destination
 func get_secret_passage_destination(suspect_name: String) -> String:
 	var token = tokens.get(suspect_name, null)
 	if token == null or token.current_room == "":
@@ -419,6 +450,7 @@ func get_secret_passage_destination(suspect_name: String) -> String:
 	var room: BoardRoomData = rooms.get(token.current_room, null)
 	return room.secret_passage_to if room != null else ""
 
+##moves a character token directly through a room's secret passage
 func use_secret_passage(suspect_name: String) -> void:
 	var dest_name := get_secret_passage_destination(suspect_name)
 	if dest_name == "":
@@ -429,6 +461,7 @@ func use_secret_passage(suspect_name: String) -> void:
 	tokens[suspect_name].move_to_cell(dest_room.centre_cell(), dest_name, self)
 	emit_signal("player_entered_room", dest_name)
 
+##forces a character token to teleport to a specific room's center
 func move_token_to_room(suspect_name: String, room_name: String) -> void:
 	var token = tokens.get(suspect_name, null)
 	var room: BoardRoomData = rooms.get(room_name, null)
@@ -438,10 +471,12 @@ func move_token_to_room(suspect_name: String, room_name: String) -> void:
 	token.move_to_cell(room.centre_cell(), room_name, self)
 	queue_redraw()
 
+##returns the name of the room a specific character is currently inside
 func get_token_room(suspect_name: String) -> String:
 	var token = tokens.get(suspect_name, null)
 	return token.current_room if token != null else ""
 	
+##moves the active token to a specified cell and emits relevant signals
 func execute_move(cell: Vector2i) -> void:
 	if _active_token == null:
 		return

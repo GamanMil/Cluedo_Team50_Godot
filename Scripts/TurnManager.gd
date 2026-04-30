@@ -18,6 +18,7 @@ var current_room: String      = ""
 var game_manager: Node        = null
 var board: Node               = null
 
+##initializes references and starts the first turn with miss scarlett
 func start_game(gm: Node, b: Node) -> void:
 	game_manager = gm
 	board        = b
@@ -26,6 +27,7 @@ func start_game(gm: Node, b: Node) -> void:
 	current_player_index = _find_active_player_by_suspect("Miss Scarlett")
 	_begin_turn()
 
+##starts a new turn or skips if the player is eliminated or spare
 func _begin_turn() -> void:
 	var player = _current_player()
 	if player.is_spare or player.is_eliminated:
@@ -34,6 +36,7 @@ func _begin_turn() -> void:
 	_set_phase(Phase.ROLL)
 	emit_signal("turn_started", player)
 
+##calculates a random dice roll and triggers the movement phase
 func action_roll_dice() -> void:
 	if current_phase != Phase.ROLL:
 		push_warning("TurnManager: action_roll_dice called outside ROLL phase")
@@ -48,6 +51,7 @@ func action_roll_dice() -> void:
 	if board != null:
 		board.highlight_reachable_cells(_current_player().suspect_name, steps_remaining)
 
+##transitions to the suggestion phase if the player enters a room
 func action_player_moved(room_name: String) -> void:
 	if current_phase != Phase.MOVE:
 		push_warning("TurnManager: action_player_moved called outside MOVE phase")
@@ -59,12 +63,14 @@ func action_player_moved(room_name: String) -> void:
 	else:
 		_end_turn()
 
+##ends the turn immediately if the player stops in a corridor
 func _on_player_entered_corridor() -> void:
 	if current_phase != Phase.MOVE:
 		return
 	current_room = ""
 	_end_turn()
 
+##teleports the player via secret passage and starts suggestion phase
 func action_use_secret_passage() -> void:
 	if current_phase != Phase.ROLL:
 		push_warning("TurnManager: secret passage can only be used at the start of a turn")
@@ -80,6 +86,7 @@ func action_use_secret_passage() -> void:
 	_set_phase(Phase.SUGGEST)
 	emit_signal("suggestion_phase_started", current_room)
 
+##initiates the disprove loop with the chosen suspect and weapon
 func action_make_suggestion(suspect: ClueCard, weapon: ClueCard) -> void:
 	if current_phase != Phase.SUGGEST:
 		push_warning("TurnManager: action_make_suggestion called outside SUGGEST phase")
@@ -94,9 +101,11 @@ func action_make_suggestion(suspect: ClueCard, weapon: ClueCard) -> void:
 		return
 	game_manager.run_disprove_loop(_current_player(), suspect, weapon, room_card)
 
+##concludes the suggestion phase and ends the player's turn
 func finish_suggestion() -> void:
 	_end_turn()
 
+##checks the final accusation and ends the game or eliminates the player
 func action_make_accusation(suspect: ClueCard, weapon: ClueCard, room: ClueCard) -> void:
 	_set_phase(Phase.ACCUSE)
 	var correct = game_manager.check_accusation(suspect, weapon, room)
@@ -107,18 +116,22 @@ func action_make_accusation(suspect: ClueCard, weapon: ClueCard, room: ClueCard)
 		emit_signal("game_over", _current_player(), false)
 		_end_turn()
 
+##signals the end of the current turn and advances to the next player
 func _end_turn() -> void:
 	_set_phase(Phase.END_TURN)
 	emit_signal("turn_ended", _current_player())
 	_advance_to_next_player()
 
+##updates the current internal game phase and broadcasts the change
 func _set_phase(phase: Phase) -> void:
 	current_phase = phase
 	emit_signal("phase_changed", phase)
 
+##returns the player object whose turn is currently active
 func _current_player() -> Player:
 	return game_manager.players[current_player_index]
 
+##finds the next valid player in the rotation or ends the game if none remain
 func _advance_to_next_player() -> void:
 	var checked := 0
 	while checked < game_manager.players.size():
@@ -130,6 +143,7 @@ func _advance_to_next_player() -> void:
 			return
 	emit_signal("game_over", null, false)
 
+##locates the starting index based on the specified suspect name
 func _find_active_player_by_suspect(suspect_name: String) -> int:
 	for i in range(game_manager.players.size()):
 		var p = game_manager.players[i]
@@ -140,6 +154,7 @@ func _find_active_player_by_suspect(suspect_name: String) -> int:
 			return i
 	return 0
 
+##converts the phase enum value into a readable string
 func phase_name(phase: Phase) -> String:
 	match phase:
 		Phase.ROLL:     return "Roll Dice"

@@ -9,6 +9,7 @@ var is_eliminated: bool           = false
 var is_human:     bool            = true  
 var is_spare:     bool            = false 
 
+##checks if the player holds any of the suggested cards in their hand
 func can_disprove(suspect_name_: String, weapon_name: String, room_name: String) -> bool:
 	for card in hand:
 		if card.card_name in [suspect_name_, weapon_name, room_name]:
