@@ -53,7 +53,7 @@ func _on_card_shown(card_name: String) -> void:
 		hud.text = "A card was shown privately"
 	else:
 		hud.text = "No card to show — passing..."
-		turn_manager.finish_suggestion()
+	turn_manager.finish_suggestion()
 	
 func _on_disprove_requested(player_name: String, matching_cards: Array) -> void:
 	var disproving_player = game_manager.get_player_by_name(player_name)
@@ -72,8 +72,18 @@ func _on_disprove_requested(player_name: String, matching_cards: Array) -> void:
 		disprove_panel.show_for_player(player_name, matching_cards)
 	
 func _on_suggestion_phase_started(room_name: String) -> void:
-	hud.text = "Make a suggestion — you are in the %s" % room_name
-	suggestion_panel.show_for_room(room_name)
+	var current_player = turn_manager._current_player()
+	if current_player is AIPlayer:
+		hud.text = "AI is making a suggestion..."
+		await get_tree().create_timer(1.0).timeout
+		var suggestion = current_player.choose_suggestion(
+			game_manager.all_suspect_cards,
+			game_manager.all_weapon_cards
+		)
+		turn_manager.action_make_suggestion(suggestion["suspect"], suggestion["weapon"])
+	else:
+		hud.text = "Make a suggestion — you are in the %s" % room_name
+		suggestion_panel.show_for_room(room_name)
 
 func _on_suggestion_confirmed(suspect_name: String, weapon_name: String) -> void:
 	var suspect = game_manager.get_suspect_card_by_name(suspect_name)
