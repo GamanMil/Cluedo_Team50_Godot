@@ -104,7 +104,6 @@ func _on_turn_started(player) -> void:
 	else:
 		roll_button.visible = false
 		hand_panel.hide()  
-		
 		await get_tree().create_timer(1.0).timeout
 		turn_manager.action_roll_dice()
 

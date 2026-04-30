@@ -14,6 +14,7 @@ func show_hand(player) -> void:
 	player_label.text = "%s's cards" % player.player_name
 	show()
 	for child in cards_hbox.get_children():
+		cards_hbox.remove_child(child)
 		child.queue_free()
 	for card in player.hand:
 		var panel      = PanelContainer.new()
@@ -45,7 +46,6 @@ func show_hand(player) -> void:
 		vbox.add_child(name_label)
 		vbox.add_child(type_label)
 		panel.add_child(vbox)
-		cards_hbox.add_child(panel)
 		cards_hbox.add_child(panel)
 		cards_container.visible = not _is_collapsed
 		show()
