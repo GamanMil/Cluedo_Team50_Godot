@@ -4,24 +4,25 @@
 
 [node name="Control" type="Control" unique_id=2039693031]
 layout_mode = 3
-anchors_preset = 8
-anchor_left = 0.5
+anchor_left = 0.51100004
 anchor_top = 0.5
-anchor_right = 0.5
+anchor_right = 0.51100004
 anchor_bottom = 0.5
-offset_left = -127.92001
+offset_left = -135.32706
 offset_top = -52.975006
-offset_right = -127.92001
+offset_right = -135.32706
 offset_bottom = -52.975006
 grow_horizontal = 2
 grow_vertical = 2
-scale = Vector2(2, 2)
+scale = Vector2(1.5, 1.5)
 script = ExtResource("1_tt5f1")
 
 [node name="Label" type="VBoxContainer" parent="." unique_id=1991162838]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = -40.23001
+offset_top = 1.3166656
+offset_right = 199.76999
+offset_bottom = 79.316666
 
 [node name="Button" type="Button" parent="Label" unique_id=1012734981]
 layout_mode = 2

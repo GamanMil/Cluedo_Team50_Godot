@@ -50,6 +50,7 @@ const TOKEN_COLORS := {
 	"Mrs White":     Color(0.92, 0.92, 0.92),
 }
 
+
 class BoardRoomData:
 	var room_name:         String            = ""
 	var cells:             Array[Vector2i]   = []
