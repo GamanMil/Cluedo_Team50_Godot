@@ -6,6 +6,7 @@ signal phase_changed(new_phase: Phase)
 signal dice_rolled(total: int, die1: int, die2: int)
 signal move_required(steps: int)
 signal suggestion_phase_started(current_room: String)
+signal accusation_phase_started() 
 signal turn_ended(player: Player)
 signal game_over(winner: Player, was_correct: bool)
 
@@ -58,6 +59,14 @@ func action_player_moved(room_name: String) -> void:
 		return
 	current_room = room_name
 	if current_room != "":
+		_set_phase(Phase.SUGGEST)
+		emit_signal("suggestion_phase_started", current_room)
+	else:
+		_end_turn()
+	if current_room == "Center": 
+		_set_phase(Phase.ACCUSE)
+		emit_signal("accusation_phase_started")
+	elif current_room != "":
 		_set_phase(Phase.SUGGEST)
 		emit_signal("suggestion_phase_started", current_room)
 	else:

@@ -50,6 +50,7 @@ func _ready() -> void:
 	turn_manager.game_over.connect(_on_game_over)
 	win_screen.play_again.connect(_on_play_again)
 	hand_toggle_button.pressed.connect(_on_hand_toggle_pressed)
+	turn_manager.accusation_phase_started.connect(_on_accusation_phase_started)
 
 ##updates the hud and resumes the turn after a card is shown or passed
 func _on_card_shown(card_name: String) -> void:
@@ -193,3 +194,10 @@ func _on_play_again() -> void:
 func _on_hand_toggle_pressed() -> void:
 	hand_panel.toggle_hand_visibility()
 	hand_toggle_button.text = "Hide Cards" if hand_panel.visible else "Show Cards"
+
+
+func _on_accusation_phase_started() -> void:
+	hud.text = "Final Accusation - You have reached the Center!"
+	accuse_button.visible = false
+	suggestion_panel.hide()
+	accusation_panel.show()

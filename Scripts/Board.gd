@@ -113,6 +113,7 @@ func _define_rooms() -> void:
 	_add_room("Conservatory",  _rect(0, 23,  4, 24),  [Vector2i(5, 23)],                                             "Lounge")
 	_add_room("Ballroom",      _rect(8, 22, 15, 24),  [Vector2i(7, 23), Vector2i(10, 21), Vector2i(13, 21), Vector2i(16, 23)], "")
 	_add_room("Kitchen",       _rect(18, 22, 23, 24), [Vector2i(17, 23), Vector2i(20, 21)],                            "Study")
+	_add_room("Center",        _rect(10, 12, 13, 15), [Vector2i(9, 13), Vector2i(14, 14), Vector2i(11, 11), Vector2i(12, 16)], "")
 
 ##creates and stores data for a single room
 func _add_room(name: String, cells: Array[Vector2i], doors: Array[Vector2i], passage: String) -> void:
