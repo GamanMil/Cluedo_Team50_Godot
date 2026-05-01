@@ -18,9 +18,9 @@ func _ready() -> void:
 	var data = game_manager._load_data("res://Resources/clue_data.json")
 	game_manager._generate_all_cards(data)
 	if GameState.play_mode == GameState.PLAY_VS_AI:
-		game_manager.setup_game(3, 2)
+		game_manager.setup_game(6, 5)
 	else:
-		game_manager.setup_game(3, 0)
+		game_manager.setup_game(6, 0)
 	
 	game_manager.turn_manager_ref = turn_manager
 	roll_button.pressed.connect(turn_manager.action_roll_dice)
