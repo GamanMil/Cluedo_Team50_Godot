@@ -178,7 +178,7 @@ func _draw_grid_lines() -> void:
 		for x in range(COLS):
 			var c := Vector2i(x, y)
 			if not _room_cells.has(c):
-				draw_rect(_cell_rect(c), COLOR_GRID, false, 1.0)
+				draw_rect(_cell_rect(c), COLOR_GRID, false, 2.0)
 
 ##renders door cells with colored borders and directional arrows
 func _draw_doors() -> void:

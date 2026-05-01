@@ -195,7 +195,7 @@ func _on_hand_toggle_pressed() -> void:
 	hand_panel.toggle_hand_visibility()
 	hand_toggle_button.text = "Hide Cards" if hand_panel.visible else "Show Cards"
 
-
+##allows final accusation phase to be started
 func _on_accusation_phase_started() -> void:
 	hud.text = "Final Accusation - You have reached the Center!"
 	accuse_button.visible = false
