@@ -1,12 +1,12 @@
 # Cluedo (Godot)
 
 A digital version of cluedo made for a university project, built with Godot 4.6.  
-This project is a student/team build focused on recreating the feel of Cluedo with a clean UI, turn-based flow, and deduction gameplay.
+This project is a student/team build focused on recreating the feel of Cluedo.
 
 ## Features
-- Classic Cluedo-style mystery gameplay
-- Turn-based movement and action flow
-- UI for notes, clues, and player status
+- Cluedo mystery gameplay
+- Turn based movement and action flow
+- UI for notes, clues and player status
 - Game state managed via an autoloaded singleton (`GameState`)
 
 ## Built With
@@ -24,9 +24,9 @@ This project is a student/team build focused on recreating the feel of Cluedo wi
 3. Press **Play**
 
 ## Project Structure
-- `Scenes/` — Game scenes and UI layouts  
-- `Scripts/` — GDScript logic  
-- `Resources/` — Assets and shared resources
+- `Scenes/` - Game scenes and UI layouts  
+- `Scripts/` - GDScript logic  
+- `Resources/` - Assets and shared resources
 
 ## Team
 - Team 50 
